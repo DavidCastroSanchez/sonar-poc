@@ -1,0 +1,5 @@
+aws_region = "us-east-1"
+project_name = "sonar"
+environment = "prod"
+owner = "prod-team"
+logging_bucket_name = "sonar-logs"
