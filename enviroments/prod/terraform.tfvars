@@ -1,5 +1,5 @@
 aws_region = "us-east-1"
-project_name = "sonar"
-environment = "production"
+project_name = "sonar-challenge"
+environment = "prod"
 owner = "prod-team"
 logging_bucket_name = "sonar-logs"

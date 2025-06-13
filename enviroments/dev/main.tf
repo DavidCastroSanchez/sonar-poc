@@ -19,6 +19,7 @@ module "vpc" {
   private_subnets  = var.private_subnets
   database_subnets = var.database_subnets
   single_nat_gateway = true
+  flow_log_retention_days = 14
   
   tags = local.common_tags
 }

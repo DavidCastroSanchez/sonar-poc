@@ -38,3 +38,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "flow_log_retention_days" {
+ description = "Number of days to retain VPC flow logs"
+ type        = number
+ default     = 14
+}
