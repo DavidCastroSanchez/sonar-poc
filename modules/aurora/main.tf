@@ -1,10 +1,8 @@
-# Random string for the password
 resource "random_password" "aurora_password" {
   length  = 16
   special = false
 }
 
-# Store the password in AWS Secrets Manager
 resource "aws_secretsmanager_secret" "aurora_secret" {
   name = "${var.project_name}-aurora-secret"
 }
@@ -17,7 +15,6 @@ resource "aws_secretsmanager_secret_version" "aurora_secret_version" {
   })
 }
 
-# Security group for Aurora
 resource "aws_security_group" "aurora" {
   name        = "${var.project_name}-aurora-sg"
   description = "Security group for Aurora cluster"
@@ -41,7 +38,6 @@ resource "aws_security_group" "aurora" {
   tags = var.tags
 }
 
-# Aurora Parameter Group
 resource "aws_rds_cluster_parameter_group" "aurora" {
   name        = "${var.project_name}-aurora-pg"
   family      = "aurora-mysql8.0"
@@ -53,14 +49,12 @@ resource "aws_rds_cluster_parameter_group" "aurora" {
   }
 }
 
-# Aurora DB Instance Parameter Group
 resource "aws_db_parameter_group" "aurora" {
   name        = "${var.project_name}-aurora-instance-pg"
   family      = "aurora-mysql8.0"
   description = "Aurora DB instance parameter group"
 }
 
-# Aurora Cluster
 resource "aws_rds_cluster" "aurora" {
   cluster_identifier      = "${var.project_name}-aurora-cluster"
   engine                  = "aurora-mysql"
@@ -89,7 +83,6 @@ resource "aws_rds_cluster" "aurora" {
   tags = var.tags
 }
 
-# Aurora Instances
 resource "aws_rds_cluster_instance" "aurora_instances" {
   count               = var.instance_count
   identifier          = "${var.project_name}-aurora-instance-${count.index + 1}"

@@ -1,4 +1,3 @@
-# IAM role for ECS task execution
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "${var.project_name}-ecs-execution-role"
 
@@ -14,13 +13,11 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   })
 }
 
-# Attach execution policy to the role
 resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# IAM role for ECS tasks
 resource "aws_iam_role" "ecs_task_role" {
   name = "${var.project_name}-ecs-task-role"
 
@@ -36,7 +33,6 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 }
 
-# ECS Task Definition
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.project_name}-task"
   requires_compatibilities = ["EC2"]
@@ -101,7 +97,6 @@ resource "aws_ecs_task_definition" "app" {
   tags = var.tags
 }
 
-# CloudWatch Log Group for container logs
 resource "aws_cloudwatch_log_group" "ecs_logs" {
   name              = "/ecs/${var.project_name}"
   retention_in_days = var.log_retention_days
@@ -109,7 +104,6 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
   tags = var.tags
 }
 
-# ECS Service
 resource "aws_ecs_service" "app" {
   name                               = "${var.project_name}-service"
   cluster                            = var.cluster_id
@@ -135,7 +129,6 @@ resource "aws_ecs_service" "app" {
   depends_on = [var.lb_listener_arn]
 }
 
-# Auto Scaling for ECS Service
 resource "aws_appautoscaling_target" "ecs" {
   service_namespace  = "ecs"
   resource_id        = "service/${var.cluster_name}/${aws_ecs_service.app.name}"
@@ -144,7 +137,6 @@ resource "aws_appautoscaling_target" "ecs" {
   max_capacity       = var.autoscaling_max_capacity
 }
 
-# CPU-based Auto Scaling Policy
 resource "aws_appautoscaling_policy" "ecs_cpu_policy" {
   name               = "${var.project_name}-scale-cpu"
   service_namespace  = aws_appautoscaling_target.ecs.service_namespace

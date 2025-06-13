@@ -1,4 +1,3 @@
-# Create the ECS cluster
 resource "aws_ecs_cluster" "cluster" {
   name = "${var.project_name}-cluster"
   
@@ -10,7 +9,6 @@ resource "aws_ecs_cluster" "cluster" {
   tags = var.tags
 }
 
-# IAM policy document for the EC2 instances to assume ECS role
 data "aws_iam_policy_document" "ecs_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -21,25 +19,21 @@ data "aws_iam_policy_document" "ecs_assume_role" {
   }
 }
 
-# IAM Role for EC2 container instances
 resource "aws_iam_role" "ecs_instance_role" {
   name               = "${var.project_name}-ecs-instance-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_role.json
 }
 
-# Attach ECS policy to allow EC2 instances to talk to ECS
 resource "aws_iam_role_policy_attachment" "ecs_instance_policy" {
   role       = aws_iam_role.ecs_instance_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
-# Create instance profile from IAM role
 resource "aws_iam_instance_profile" "ecs_instance_profile" {
   name = "${var.project_name}-ecs-instance-profile"
   role = aws_iam_role.ecs_instance_role.name
 }
 
-# Lookup the latest ECS-optimized Amazon Linux 2 AMI
 data "aws_ami" "ecs" {
   most_recent = true
   owners      = ["amazon"]
@@ -49,7 +43,6 @@ data "aws_ami" "ecs" {
   }
 }
 
-# Security group for ECS instances
 resource "aws_security_group" "ecs_instances" {
   name        = "${var.project_name}-ecs-instances"
   description = "Security group for ECS instances"
@@ -72,7 +65,6 @@ resource "aws_security_group" "ecs_instances" {
   tags = var.tags
 }
 
-# Launch Template for ECS EC2 instances
 resource "aws_launch_template" "ecs" {
   name_prefix   = "${var.project_name}-ecs-lt-"
   image_id      = data.aws_ami.ecs.id
@@ -97,7 +89,6 @@ resource "aws_launch_template" "ecs" {
   }
 }
 
-# Auto Scaling Group to maintain ECS EC2 capacity
 resource "aws_autoscaling_group" "ecs_asg" {
   name                = "${var.project_name}-ecs-asg"
   desired_capacity    = var.desired_capacity
